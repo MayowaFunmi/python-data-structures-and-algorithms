@@ -77,8 +77,8 @@ def divide_base():
     print("remainder = ", rem_con)
 
 #add_base()
-subtract_base()
+#subtract_base()
 #multiply_base()
 #divide_base()
 #print(convert_to_10())
-#print(convert_from_10())
+print(convert_from_10())

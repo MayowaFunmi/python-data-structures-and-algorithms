@@ -13,10 +13,10 @@ class Queue:
         return self.buffer.pop()
         
     def is_empty(self):
-        return len(self.bufferr) == 0
+        return len(self.buffer) == 0
         
     def size(self):
-        return len(self0lbuffer)
+        return len(self.buffer)
         
         
 d = Queue()

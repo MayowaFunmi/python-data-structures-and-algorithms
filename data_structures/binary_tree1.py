@@ -53,6 +53,37 @@ class BinarySearchTreeNode:
             else:
                 return False
 
+    def find_max(self):
+        if self.right is None:
+            return self.data
+        return self.right.find_max()
+
+    def find_min(self):
+        if self.left is None:
+            return self.data
+        return self.left.find_min()
+
+    def delete(self, val):
+        if val < self.data:
+            if self.left:
+                self.left = self.left.delete(val)
+        elif val > self.data:
+            if self.right:
+                self.right = self.right.delete(val)
+        else:
+            if self.left is None and self.right is None:
+                return None
+            elif self.left is None:
+                return self.right
+            elif self.right is None:
+                return self.left
+
+            min_val = self.right.find_min()
+            self.data = min_val
+            self.right = self.right.delete(min_val)
+
+        return self
+
 
 def build_tree(elements):
     root = BinarySearchTreeNode(elements[0])
@@ -68,6 +99,9 @@ if __name__ == '__main__':
     numbers_tree = build_tree(numbers)
     print(numbers_tree.in_order_traversal())
     print(numbers_tree.search(1))
+    print(numbers_tree.find_min())
+    numbers_tree.delete(20)
+    print('After deleting 20: ', numbers_tree.in_order_traversal())
 
     countries = ['India', 'Nigeria', 'Germany', 'USA', 'China', 'India', 'UK', 'USA']
     country_tree = build_tree(countries)

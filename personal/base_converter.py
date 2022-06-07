@@ -15,7 +15,7 @@ def to_base_10(num1, base1):
 #base = int(input("Enter the base you want to convert to : "))
 
 def from_base_10(num, base):
-    numToChar = {i: "0123456789ABCDEF"[i] for i in range(16)}
+    numToChar = {i: "0123456789ABCDEFabcdef"[i] for i in range(16)}
     
     # set power to largest
     power = int(log(num, base))
