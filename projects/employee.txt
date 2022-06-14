@@ -1,4 +1,3 @@
-import sqlite3
 from tkinter import *
 from tkinter import ttk, messagebox
 from PIL import Image, ImageTk
@@ -81,21 +80,6 @@ class Employee:
         upper_frame.place(x=10, y=0, width=1350, height=230)
 
         # labels and entry fields
-        global combo_dep
-        global txt_name
-        global txt_description
-        global txt_email
-        global txt_address
-        global com_txt_married
-        global txt_dob
-        global txt_doj
-        global com_txt_proof
-        global txt_proof
-        global com_txt_gender
-        global txt_phone
-        global txt_country
-        global txt_salary
-
         lbl_dep = Label(upper_frame, text='Department:', font=('Poppins', 12, 'bold'), bg='white')
         lbl_dep.grid(row=0, column=0, padx=2, sticky=W)
 
@@ -263,14 +247,13 @@ class Employee:
         scroll_x = ttk.Scrollbar(table_frame, orient=HORIZONTAL)
         scroll_y = ttk.Scrollbar(table_frame, orient=VERTICAL)
 
-        self.employee_table = ttk.Treeview(table_frame, column=('S/N', 'Dept', 'Name', 'Desg', 'Email', 'Address', 'Married', 'DoB', 'Joined', 'ID', 'ID Number', 'Gender', "Phone", 'Country', 'Salary'), xscrollcommand=scroll_x.set, yscrollcommand=scroll_y.set)
+        self.employee_table = ttk.Treeview(table_frame, column=('Dept', 'Name', 'Desg', 'Email', 'Address', 'Married', 'DoB', 'Joined', 'ID', 'Gender', "Phone", 'Country', 'Salary'), xscrollcommand=scroll_x.set, yscrollcommand=scroll_y.set)
         scroll_x.pack(side=BOTTOM, fill=X)
         scroll_y.pack(side=RIGHT, fill=Y)
 
         scroll_x.config(command=self.employee_table.xview)
         scroll_y.config(command=self.employee_table.yview)
 
-        self.employee_table.heading('S/N', text='S/N')
         self.employee_table.heading('Dept', text='Department')
         self.employee_table.heading('Name', text='Name')
         self.employee_table.heading('Desg', text='Designation')
@@ -280,47 +263,31 @@ class Employee:
         self.employee_table.heading('DoB', text='Date Of Birth')
         self.employee_table.heading('Joined', text='Date Joined')
         self.employee_table.heading('ID', text='Identity')
-        self.employee_table.heading('ID Number', text='ID Number')
         self.employee_table.heading('Gender', text='Gender')
         self.employee_table.heading('Phone', text='Phone')
         self.employee_table.heading('Country', text='Country')
         self.employee_table.heading('Salary', text='Salary')
 
         self.employee_table['show'] = 'headings'
-        self.employee_table.column('S/N', width=75)
-        self.employee_table.column('Dept', width=150)
-        self.employee_table.column('Name', width=150)
-        self.employee_table.column('Desg', width=150)
-        self.employee_table.column('Email', width=150)
-        self.employee_table.column('Address', width=150)
-        self.employee_table.column('Married', width=200)
-        self.employee_table.column('DoB', width=200)
-        self.employee_table.column('Joined', width=150)
-        self.employee_table.column('ID', width=150)
-        self.employee_table.column('ID Number', width=150)
-        self.employee_table.column('Gender', width=150)
-        self.employee_table.column('Phone', width=150)
-        self.employee_table.column('Country', width=150)
-        self.employee_table.column('Salary', width=150)
+        self.employee_table.column('Dept', width=100)
+        self.employee_table.column('Name', width=100)
+        self.employee_table.column('Desg', width=100)
+        self.employee_table.column('Email', width=100)
+        self.employee_table.column('Address', width=100)
+        self.employee_table.column('Married', width=150)
+        self.employee_table.column('DoB', width=150)
+        self.employee_table.column('Joined', width=100)
+        self.employee_table.column('ID', width=100)
+        self.employee_table.column('Gender', width=100)
+        self.employee_table.column('Phone', width=100)
+        self.employee_table.column('Country', width=100)
+        self.employee_table.column('Salary', width=100)
 
         self.employee_table.pack(fill=BOTH, expand=1)
-        self.employee_table.bind('<ButtonRelease>', self.get_cursor)
-        self.fetch_data()
+
+
     # =============== Function Declaration ========================
 
-    def clear_fields(self):
-        combo_dep.current(0)
-        txt_name.delete(0, END)
-        txt_description.delete(0, END)
-        txt_email.delete(0, END)
-        txt_address.delete(0, END)
-        com_txt_married.current(0)
-        com_txt_proof.current(0)
-        txt_proof.delete(0, END)
-        com_txt_gender.current(0)
-        txt_phone.delete(0, END)
-        txt_country.delete(0, END)
-        txt_salary.delete(0, END)
 
     def add_employee(self):
         if self.var_dep.get() == '' or self.var_name.get() == '' or self.var_designation.get() == '' or self.var_email.get() == '' or \
@@ -329,71 +296,121 @@ class Employee:
                 self.var_country.get() == '' or self.var_salary.get() == '':
             messagebox.showerror('Error', 'All fields are required!')
         else:
-            employee_backend.employee_data(
-                self.var_dep.get(),
-                self.var_name.get(),
-                self.var_designation.get(),
-                self.var_email.get(),
-                self.var_address.get(),
-                self.var_married.get(),
-                self.var_dob.get(),
-                self.var_doj.get(),
-                self.var_idproofcomb.get(),
-                self.var_idproof.get(),
-                self.var_gender.get(),
-                self.var_phone.get(),
-                self.var_country.get(),
-                self.var_salary.get(),
-            )
-            self.fetch_data()
-            # clear all fields
-            self.clear_fields()
-            messagebox.showinfo('Added Successfully', 'Employee Data Has Been Added')
+            try:
+                employee_backend.employee_table()
+                employee_backend.employee_data(
+                    self.var_dep.get(),
+                    self.var_name.get(),
+                    self.var_designation.get(),
+                    self.var_email.get(),
+                    self.var_address.get(),
+                    self.var_married.get(),
+                    self.var_dob.get(),
+                    self.var_doj.get(),
+                    self.var_idproofcomb.get(),
+                    self.var_idproof.get(),
+                    self.var_gender.get(),
+                    self.var_phone.get(),
+                    self.var_country.get(),
+                    self.var_salary.get(),
+                )
+            except:
+                employee_backend.employee_data(
+                    self.var_dep.get(),
+                    self.var_name.get(),
+                    self.var_designation.get(),
+                    self.var_email.get(),
+                    self.var_address.get(),
+                    self.var_married.get(),
+                    self.var_dob.get(),
+                    self.var_doj.get(),
+                    self.var_idproofcomb.get(),
+                    self.var_idproof.get(),
+                    self.var_gender.get(),
+                    self.var_phone.get(),
+                    self.var_country.get(),
+                    self.var_salary.get(),
+                )
 
-    # fetch data
-    def fetch_data(self):
-        conn = sqlite3.connect('projects/employee.db')
-        cursor = conn.cursor()
-        cursor.execute('SELECT oid, * FROM employee_table')
-        data = cursor.fetchall()
 
-        if len(data) != 0:
-            self.employee_table.delete(*self.employee_table.get_children())
-            for i in data:
-                self.employee_table.insert('', END, values=i)
-        conn.commit()
-        conn.close()
 
-    # Get Cursor
-    def get_cursor(self, event=''):
-        cursor_row = self.employee_table.focus()
-        content = self.employee_table.item(cursor_row)
-        data = content['values']
 
-        self.var_dep.set(data[1])
-        self.var_name.set(data[2]),
-        self.var_designation.set(data[3]),
-        self.var_email.set(data[4]),
-        self.var_address.set(data[5]),
-        self.var_married.set(data[6]),
-        self.var_dob.set(data[7]),
-        self.var_doj.set(data[8]),
-        self.var_idproofcomb.set(data[9]),
-        self.var_idproof.set(data[10]),
-        self.var_gender.set(data[11]),
-        self.var_phone.set(data[12]),
-        self.var_country.set(data[13]),
-        self.var_salary.set(data[14]),
 
-    # update data
-    def update_data(self):
-        if self.var_dep.get() == '' or self.var_name.get() == '' or self.var_designation.get() == '' or self.var_email.get() == '' or \
-                self.var_address.get() == '' or self.var_married.get() == '' or self.var_dob.get() == '' or self.var_doj.get() == '' or \
-                self.var_idproof.get() == '' or self.var_idproofcomb.get() == '' or self.var_gender.get() == '' or self.var_phone.get() == '' or \
-                self.var_country.get() == '' or self.var_salary.get() == '':
+
+    def add_data(self):
+        if self.var_dep.get() == '' or self.var_email.get() == '':
             messagebox.showerror('Error', 'All fields are required!')
         else:
-            update = messagebox.askyesno('Update Data', 'Update This Employee Data')
+            try:
+                # first connect to postgres database
+                connection = psycopg2.connect(
+                    user='postgres',
+                    password="Treasure@1",
+                    host="localhost",
+                    port="5432",
+                    database="postgres"
+                )
+                connection.autocommit = True
+                cursor = connection.cursor()
+                # create new database
+                cursor.execute('''DROP DATABASE IF EXISTS employee_database3;''')
+                cursor.execute('''CREATE DATABASE employee_database3;''')
+                cursor.execute('''CREATE USER employee3 WITH ENCRYPTED PASSWORD 'employee_password';''')
+                cursor.execute('''ALTER ROLE employee3 SET client_encoding TO 'utf8';''')
+                cursor.execute('''ALTER ROLE employee3 SET default_transaction_isolation TO 'read committed';''')
+                cursor.execute('''ALTER ROLE employee3 SET timezone TO 'Africa/Lagos';''')
+                cursor.execute('''GRANT ALL PRIVILEGES ON DATABASE employee_database3 TO employee3;''')
+                print("Database (employee_database3) created successfully........")
+
+                connection.close()
+
+                conn = psycopg2.connect('dbname=employee_database3')
+                cursor = conn.cursor()
+                cursor.execute(
+                    '''
+                    CREATE TABLE employee_table (
+                        id INTEGER PRIMARY KEY,
+                        department VARCHAR NOT NULL,
+                        name VARCHAR NOT NULL,
+                        designation VARCHAR NOT NULL,
+                        email VARCHAR NOT NULL,
+                        address VARCHAR NOT NULL,
+                        marital_status VARCHAR NOT NULL,
+                        date_of_birth VARCHAR NOT NULL,
+                        date_joined VARCHAR NOT NULL,
+                        id_type VARCHAR NOT NULL,
+                        id_value VARCHAR NOT NULL,
+                        gender VARCHAR NOT NULL,
+                        phone VARCHAR NOT NULL,
+                        country VARCHAR NOT NULL,
+                        salary VARCHAR NOT NULL,
+                    );
+                    '''
+                )
+                print('employee_table created successfully!!!')
+                cursor.execute('insert into employee_table values(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)', (
+                    self.var_dep.get(),
+                    self.var_name.get(),
+                    self.var_designation.get(),
+                    self.var_email.get(),
+                    self.var_address.get(),
+                    self.var_married.get(),
+                    self.var_dob.get(),
+                    self.var_doj.get(),
+                    self.var_idproofcomb.get(),
+                    self.var_idproof.get(),
+                    self.var_gender.get(),
+                    self.var_phone.get(),
+                    self.var_country.get(),
+                    self.var_salary.get(),
+                ))
+                conn.commit()
+                conn.close()
+                messagebox.showinfo('Success', 'Employee has been added successfully!', parent=self.root)
+            except Exception as es:
+                print(es)
+                messagebox.showerror('Error', f'Due to {str(es)}', parent=self.root)
+
 
 if __name__ == '__main__':
     root = Tk()

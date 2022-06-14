@@ -6,7 +6,7 @@ root = Tk()
 root.title('Affable Digital Services')
 root.geometry('400x400')
 
-# create or connect a databse
+# create or connect a database
 conn = sqlite3.connect('address_book.db')
 c = conn.cursor()
 
@@ -17,7 +17,7 @@ c.execute('''
         last_name text,
         address text,
         city text,
-        state text.
+        state text,
         zipcode integer
     )
 ''')
