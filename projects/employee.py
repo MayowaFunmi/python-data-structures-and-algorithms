@@ -18,6 +18,7 @@ class Employee:
         self.root.title('Employee Management System')
         self.root.rowconfigure(0, weight=1, minsize=50)
         #self.root.columnconfigure(2, weight=1, minsize=75)
+        self.var_id = StringVar()
         self.var_dep = StringVar()
         self.var_name = StringVar()
         self.var_designation = StringVar()
@@ -32,6 +33,8 @@ class Employee:
         self.var_phone = StringVar()
         self.var_country = StringVar()
         self.var_salary = StringVar()
+        self.var_com_search = StringVar()
+        self.var_search = StringVar()
 
         lbl_title = Label(self.root, text='EMPLOYEE MANAGEMENT SYSTEM', font=('Poppins', 37, 'bold'), fg='darkblue', bg='white')
         lbl_title.place(x=0, y=0, width=1350, height=50)
@@ -95,6 +98,7 @@ class Employee:
         global txt_phone
         global txt_country
         global txt_salary
+        global btn_add
 
         lbl_dep = Label(upper_frame, text='Department:', font=('Poppins', 12, 'bold'), bg='white')
         lbl_dep.grid(row=0, column=0, padx=2, sticky=W)
@@ -207,13 +211,13 @@ class Employee:
         btn_add = Button(button_frame, text='Save', command=self.add_employee, font=('Poppins', 10, 'bold'), width=10, bg='blue', fg='white')
         btn_add.grid(row=0, column=0, padx=0, pady=5)
 
-        btn_update = Button(button_frame, text='Update', font=('Poppins', 10, 'bold'), width=10, bg='blue', fg='white')
+        btn_update = Button(button_frame, text='Update', font=('Poppins', 10, 'bold'), width=10, bg='blue', fg='white', command=self.update_data)
         btn_update.grid(row=1, column=0, padx=0, pady=5)
 
-        btn_delete = Button(button_frame, text='Delete', font=('Poppins', 10, 'bold'), width=10, bg='blue', fg='white')
+        btn_delete = Button(button_frame, text='Delete', font=('Poppins', 10, 'bold'), width=10, bg='blue', fg='white', command=self.delete)
         btn_delete.grid(row=2, column=0, padx=0, pady=5)
 
-        btn_clear = Button(button_frame, text='Clear', font=('Poppins', 10, 'bold'), width=10, bg='blue', fg='white')
+        btn_clear = Button(button_frame, text='Clear', font=('Poppins', 10, 'bold'), width=10, bg='blue', fg='white', command=self.clear_fields)
         btn_clear.grid(row=3, column=0, padx=0, pady=5)
 
         # down frame
@@ -230,18 +234,18 @@ class Employee:
         search_by.grid(row=0, column=0, sticky=W, padx=5)
 
         # search
-        com_txt_search = ttk.Combobox(search_frame, state='readonly', font=('arial', 12, 'bold'), width=18)
-        com_txt_search['value'] = ('Select Option', 'Phone Number', 'Identity')
+        com_txt_search = ttk.Combobox(search_frame, textvariable=self.var_com_search, state='readonly', font=('arial', 12, 'bold'), width=18)
+        com_txt_search['value'] = ('Select Option', 'Department', 'Name', 'Designation', 'Email', 'Marital Status', 'Date Of Birth', 'Date Joined', 'ID Type', 'ID Value', 'Gender', 'Phone', 'Country', 'Salary')
         com_txt_search.current(0)
         com_txt_search.grid(row=0, column=1, sticky=W, padx=5)
 
-        txt_search = ttk.Entry(search_frame, width=22, font=('arial', 11, 'bold'))
+        txt_search = ttk.Entry(search_frame, textvariable=self.var_search, width=22, font=('arial', 11, 'bold'))
         txt_search.grid(row=0, column=2, padx=5)
 
-        btn__search = Button(search_frame, text='Search', font=('arial', 11, 'bold'), width=14, bg='blue', fg='white')
+        btn__search = Button(search_frame, text='Search', command=self.search_data, font=('arial', 11, 'bold'), width=14, bg='blue', fg='white')
         btn__search.grid(row=0, column=3, padx=5)
 
-        btn_showAll = Button(search_frame, text='Show All', font=('arial', 11, 'bold'), width=14, bg='blue', fg='white')
+        btn_showAll = Button(search_frame, command=self.fetch_data, text='Show All', font=('arial', 11, 'bold'), width=14, bg='blue', fg='white')
         btn_showAll.grid(row=0, column=4, padx=5)
 
         stayhome = Label(search_frame, text='Wear A Mask', font=('times new roman', 30, 'bold'), fg='red', bg='white')
@@ -291,7 +295,7 @@ class Employee:
         self.employee_table.column('Dept', width=150)
         self.employee_table.column('Name', width=150)
         self.employee_table.column('Desg', width=150)
-        self.employee_table.column('Email', width=150)
+        self.employee_table.column('Email', width=200)
         self.employee_table.column('Address', width=150)
         self.employee_table.column('Married', width=200)
         self.employee_table.column('DoB', width=200)
@@ -309,8 +313,8 @@ class Employee:
     # =============== Function Declaration ========================
 
     def clear_fields(self):
-        combo_dep.current(0)
-        txt_name.delete(0, END)
+        combo_dep.current(0)    # self.var_dep.set('Department')
+        txt_name.delete(0, END) # self.var_name.set('')
         txt_description.delete(0, END)
         txt_email.delete(0, END)
         txt_address.delete(0, END)
@@ -321,6 +325,7 @@ class Employee:
         txt_phone.delete(0, END)
         txt_country.delete(0, END)
         txt_salary.delete(0, END)
+        btn_add['state'] = 'normal'
 
     def add_employee(self):
         if self.var_dep.get() == '' or self.var_name.get() == '' or self.var_designation.get() == '' or self.var_email.get() == '' or \
@@ -366,10 +371,13 @@ class Employee:
 
     # Get Cursor
     def get_cursor(self, event=''):
+        btn_add['state'] = 'disabled'
         cursor_row = self.employee_table.focus()
         content = self.employee_table.item(cursor_row)
         data = content['values']
 
+        global id
+        id = data[0]
         self.var_dep.set(data[1])
         self.var_name.set(data[2]),
         self.var_designation.set(data[3]),
@@ -393,7 +401,108 @@ class Employee:
                 self.var_country.get() == '' or self.var_salary.get() == '':
             messagebox.showerror('Error', 'All fields are required!')
         else:
-            update = messagebox.askyesno('Update Data', 'Update This Employee Data')
+            update = messagebox.askyesno('Update Data', 'Update This Employee Data?')
+            if update > 0:
+                conn = sqlite3.connect('projects/employee.db')
+                cursor = conn.cursor()
+                cursor.execute("""UPDATE employee_table SET
+                    department = :department,
+                    name = :name,
+                    designation = :designation,
+                    email = :email,
+                    address = :address,
+                    marital_status = :marital_status,
+                    date_of_birth = :date_of_birth,
+                    date_joined = :date_joined,
+                    id_type = :id_type,
+                    id_value = :id_value,
+                    gender = :gender,
+                    phone = :phone,
+                    country = :country,
+                    salary = :salary
+                    WHERE oid = :oid""",
+
+                    {
+                        'department': self.var_dep.get(),
+                        'name': self.var_name.get(),
+                        'designation': self.var_designation.get(),
+                        'email': self.var_email.get(),
+                        'address': self.var_address.get(),
+                        'marital_status': self.var_married.get(),
+                        'date_of_birth': self.var_dob.get(),
+                        'date_joined': self.var_doj.get(),
+                        'id_type': self.var_idproofcomb.get(),
+                        'id_value': self.var_idproof.get(),
+                        'gender': self.var_gender.get(),
+                        'phone': self.var_phone.get(),
+                        'country': self.var_country.get(),
+                        'salary': self.var_salary.get(),
+                        'oid': id
+                    })
+                conn.commit()
+                conn.close()
+                self.fetch_data()
+                self.clear_fields()
+                messagebox.showinfo('Update Successful', 'Employee Data Has Been Updated!!!', parent=self.root)
+                btn_add['state'] = 'normal'
+
+            else:
+                if not update:
+                    return
+
+    # delete
+    def delete(self):
+        if self.var_dep.get() == '' or self.var_name.get() == '' or self.var_designation.get() == '' or self.var_email.get() == '' or \
+                self.var_address.get() == '' or self.var_married.get() == '' or self.var_dob.get() == '' or self.var_doj.get() == '' or \
+                self.var_idproof.get() == '' or self.var_idproofcomb.get() == '' or self.var_gender.get() == '' or self.var_phone.get() == '' or \
+                self.var_country.get() == '' or self.var_salary.get() == '':
+            messagebox.showerror('Error', 'Select An Employee Data To Delete. All Fields Required')
+        else:
+            delete = messagebox.askyesno('Delete Data', 'Delete This Employee Data?', parent=self.root)
+            if delete > 0:
+                conn = sqlite3.connect('projects/employee.db')
+                cursor = conn.cursor()
+
+                cursor.execute("DELETE FROM employee_table WHERE oid= " + str(id))
+
+                conn.commit()
+                conn.close()
+                self.fetch_data()
+                self.clear_fields()
+                messagebox.showinfo('Delete Successful', 'Employee Data Has Been Deleted!!!', parent=self.root)
+
+    # search
+
+    def search_data(self):
+        if self.var_com_search.get() == 'Select Option' or self.var_search.get() == '':
+            messagebox.showerror('Error', 'Please Select An Option')
+        else:
+            try:
+                search_option = self.var_com_search.get()
+                search = employee_backend.rename(search_option)
+                print(search)
+                search_val = self.var_search.get()
+                print(search_val)
+
+                conn = sqlite3.connect('projects/employee.db')
+                cursor = conn.cursor()
+
+                cursor.execute("SELECT oid, * FROM employee_table WHERE " + search + " = " + search_val)
+
+                rows = cursor.fetchall()
+                print(rows)
+                if len(rows) != 0:
+                    self.employee_table.delete(*self.employee_table.get_children())
+                    for i in rows:
+                        self.employee_table.insert('', END, values=i)
+                else:
+                    messagebox.showerror('Error', 'Data Not Found!!!', parent=self.root)
+
+                conn.commit()
+                conn.close()
+            except:
+                messagebox.showerror('Error', 'Something went wrong')
+
 
 if __name__ == '__main__':
     root = Tk()

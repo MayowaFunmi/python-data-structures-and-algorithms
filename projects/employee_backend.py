@@ -21,3 +21,10 @@ def employee_data(dep, name, designation, email, address, married, dob, doj, idp
     ))
     conn.commit()
     conn.close()
+
+
+# function to change search type
+def rename(option):
+    lower = option.lower()
+    c = lower.replace(' ', '_')
+    return c
